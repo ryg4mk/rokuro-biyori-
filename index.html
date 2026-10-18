@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4ede0">
+  <meta name="description" content="指で粘土を押したり引いたり。お手本に近づけて器を作る、のんびり陶芸ブラウザゲーム。">
+  <meta property="og:title" content="ろくろ日和 | 指先で陶芸ゲーム">
+  <meta property="og:description" content="ろくろを回して、世界にひとつだけの器をつくろう。">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>ろくろ日和 | 指先で陶芸ゲーム</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="game.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="ろくろ日和 トップへ">
+        <span class="brand-seal" aria-hidden="true">陶</span>
+        <span class="brand-text"><strong>ろくろ日和</strong><small>SMALL POTTERY STUDIO</small></span>
+      </a>
+      <div class="header-actions">
+        <button id="soundButton" class="icon-button" aria-label="効果音をオンにする" title="効果音の切り替え">♪ <span id="soundState">OFF</span></button>
+        <button id="helpButton" class="icon-button" title="遊びかた">？ <span class="desktop-only">あそびかた</span></button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="game-panel" aria-label="ろくろ体験">
+        <div class="stage-head">
+          <div class="stage-title-wrap">
+            <div class="eyebrow">TODAY'S ORDER <span id="stageCount">01 / 05</span></div>
+            <h1 id="orderName">はじめての茶碗</h1>
+            <p id="orderDesc" class="muted">口がひらいた、やさしい形のお茶碗をつくろう。</p>
+          </div>
+          <div class="fit-card" aria-live="off">
+            <span>お手本との一致度</span>
+            <strong id="fitNumber">--<small>%</small></strong>
+            <div class="progress-track"><div id="fitFill" class="progress-fill"></div></div>
+          </div>
+        </div>
+
+        <div class="scene-wrap">
+          <canvas id="potteryCanvas" aria-label="ろくろ。器の上を左右にドラッグすると形が変わります。" role="img" tabindex="0"></canvas>
+          <div class="scene-topline" aria-hidden="true"><span class="scene-dot"></span> WHEEL IN MOTION <span class="scene-sparkle">✧</span></div>
+          <div class="scene-bottomline" aria-hidden="true">つまんで、ひろげて。指先が、かたちになる。</div>
+          <div class="canvas-hint" id="canvasHint" aria-hidden="true"><span class="hint-arrows">↔</span><span>器を左右にドラッグ</span></div>
+        </div>
+
+        <div class="under-scene">
+          <div class="stage-steps" id="stageSteps" aria-label="ステージ進行"></div>
+          <span class="time-label">制作時間 <strong id="timeReadout">00:00</strong></span>
+        </div>
+      </section>
+
+      <aside class="studio-sidebar" aria-label="制作メニュー">
+        <section class="sidebar-card order-card">
+          <div class="card-heading"><span class="card-index">01</span><h2>今日のお題</h2></div>
+          <div class="reference-content">
+            <canvas id="referenceCanvas" width="260" height="200" aria-label="目標の器のシルエット"></canvas>
+            <div class="reference-copy">
+              <strong id="referenceName">茶碗</strong>
+              <p id="referenceDesc">形をお手本に近づけよう</p>
+              <div class="difficulty" id="difficulty" aria-label="難易度">● ○ ○</div>
+            </div>
+          </div>
+          <button id="guideButton" class="quiet-button guide-toggle" aria-pressed="true">◉ お手本ライン ON</button>
+        </section>
+
+        <section class="sidebar-card glaze-card">
+          <div class="card-heading"><span class="card-index">02</span><h2>釉薬をえらぶ</h2></div>
+          <p class="card-subtitle">好きな色で、世界にひとつの器に。</p>
+          <div class="glazes" id="glazes" role="group" aria-label="釉薬の色">
+            <button class="glaze-swatch selected" style="--swatch:#c47858" data-glaze="clay" aria-label="素焼き" aria-pressed="true" title="素焼き"><span></span></button>
+            <button class="glaze-swatch" style="--swatch:#749b91" data-glaze="jade" aria-label="青磁" aria-pressed="false" title="青磁"><span></span></button>
+            <button class="glaze-swatch" style="--swatch:#3e637e" data-glaze="indigo" aria-label="藍釉" aria-pressed="false" title="藍釉"><span></span></button>
+            <button class="glaze-swatch" style="--swatch:#decaaa" data-glaze="cream" aria-label="粉引" aria-pressed="false" title="粉引"><span></span></button>
+            <button class="glaze-swatch" style="--swatch:#665a54" data-glaze="charcoal" aria-label="黒陶" aria-pressed="false" title="黒陶"><span></span></button>
+          </div>
+          <div class="glaze-name" id="glazeName">素焼き <span>— 土のぬくもり</span></div>
+        </section>
+
+        <section class="sidebar-card tool-card">
+          <div class="card-heading"><span class="card-index">03</span><h2>仕上げよう</h2></div>
+          <div class="micro-instructions"><span>↔</span><p>器の好きな高さを<strong>左右へドラッグ</strong>。外に引くとふくらみ、内に押すと細くなります。</p></div>
+          <div class="tool-row">
+            <button class="outline-button" id="undoButton">↶ <span>ひとつ戻す</span></button>
+            <button class="outline-button" id="resetButton">↺ <span>最初から</span></button>
+          </div>
+          <button id="finishButton" class="primary-button"><span>この器を完成させる</span><span class="button-arrow">→</span></button>
+          <p class="save-note">制限時間なし · 記録はこの端末に保存</p>
+        </section>
+        <button id="galleryButton" class="gallery-link">▤ <span>これまでの作品棚を見る</span> <span>→</span></button>
+      </aside>
+    </main>
+    <footer class="site-footer"><span>ろくろ日和 <span aria-hidden="true">✳</span> ひと休みの、小さな陶房。</span><span>MADE FOR SLOW, HAPPY MOMENTS</span></footer>
+  </div>
+
+  <div id="modalBackdrop" class="modal-backdrop" role="presentation">
+    <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
+      <div class="modal-inner" id="modalInner"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
